@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/test")
-public class TestUserController {
+public class TestUserController<id> {
 
     private final TestUserService service;
 
@@ -26,5 +26,11 @@ public class TestUserController {
     @GetMapping
     public List<TestUser> getAll() {
         return service.getAllUsers();
+    }
+
+    @DeleteMapping("/id")
+    public String delete(@PathVariable Long id) {
+        service.deleteUser(id);
+        return "user deleted";
     }
 }
