@@ -23,4 +23,8 @@ public class TestUserService {
     public List<TestUser> getAllUsers() {
         return dao.findAll();
     }
+
+    public void deleteUser(Long id) {
+        dao.deleteById(id);
+    }
 }
