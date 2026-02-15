@@ -24,4 +24,12 @@ public class TestUserDao {
         Session session = sessionFactory.getCurrentSession();
         return session.createQuery("from TestUser", TestUser.class).getResultList();
     }
+
+    public void deleteById(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        TestUser user = session.get(TestUser.class, id);
+        if (user != null) {
+            session.delete(user);
+        }
+    }
 }

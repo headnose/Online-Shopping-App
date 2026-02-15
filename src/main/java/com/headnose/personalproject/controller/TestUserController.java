@@ -27,6 +27,4 @@ public class TestUserController {
     public List<TestUser> getAll() {
         return service.getAllUsers();
     }
-
-
 }
