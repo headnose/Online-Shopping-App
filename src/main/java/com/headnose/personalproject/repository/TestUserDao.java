@@ -32,4 +32,12 @@ public class TestUserDao {
             session.delete(user);
         }
     }
+
+    public TestUser findById(Long id) {
+        return sessionFactory.getCurrentSession().get(TestUser.class, id);
+    }
+
+    public void update(TestUser user) {
+        sessionFactory.getCurrentSession().merge(user);
+    }
 }

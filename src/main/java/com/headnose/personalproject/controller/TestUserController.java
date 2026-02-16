@@ -33,4 +33,10 @@ public class TestUserController<id> {
         service.deleteUser(id);
         return "user deleted";
     }
+
+    @PutMapping("/{id}/{name}")
+    public String update(@PathVariable Long id, @PathVariable String name) {
+        service.updateUser(id, name);
+        return "user updated";
+    }
 }

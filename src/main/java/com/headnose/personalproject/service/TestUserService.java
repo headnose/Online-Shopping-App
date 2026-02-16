@@ -27,4 +27,15 @@ public class TestUserService {
     public void deleteUser(Long id) {
         dao.deleteById(id);
     }
+
+    public void updateUser(Long id, String newName) {
+        TestUser user = dao.findById(id);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setName(newName);
+        dao.update(user);
+    }
 }
