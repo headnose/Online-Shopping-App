@@ -28,7 +28,7 @@ public class TestUserController<id> {
         return service.getAllUsers();
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         service.deleteUser(id);
         return "user deleted";
