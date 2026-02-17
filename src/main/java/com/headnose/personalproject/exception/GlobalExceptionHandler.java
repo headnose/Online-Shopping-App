@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(NotEnoughInventoryException.class)
+    public ResponseEntity<String> handleNotEnoughInventory(NotEnoughInventoryException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
 }
