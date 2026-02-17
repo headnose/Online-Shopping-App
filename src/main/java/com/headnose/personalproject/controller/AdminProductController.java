@@ -42,4 +42,10 @@ public class AdminProductController {
 
         productService.updateProduct(existing);
     }
+
+    // DELETE product
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+    }
 }

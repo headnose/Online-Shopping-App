@@ -50,4 +50,8 @@ public class ProductDao {
         sessionFactory.getCurrentSession().merge(product);
     }
 
+    public void delete(Product product) {
+        sessionFactory.getCurrentSession().remove(product);
+    }
+
 }

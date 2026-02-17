@@ -8,7 +8,6 @@ import com.headnose.personalproject.service.UserService;
 
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -56,16 +55,13 @@ public class AuthController {
             throw new InvalidCredentialsException("Invalid login");
         }
 
-        UserDetails userDetails =
-                userService.findByUsername(request.getUsername()) != null
-                        ? new com.headnose.personalproject.security
-                        .CustomUserDetails(
-                        userService.findByUsername(request.getUsername()))
-                        : null;
+        User user = userService.findByUsername(request.getUsername());
+
+        String role = user.getRole(); // ex: ROLE_USER or ROLE_ADMIN
 
         String token = jwtUtil.generateToken(
-                userDetails.getUsername(),
-                userDetails.getAuthorities().iterator().next().getAuthority()
+                user.getUsername(),
+                role
         );
 
         return new AuthResponse(token);

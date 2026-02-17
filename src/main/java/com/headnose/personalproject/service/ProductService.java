@@ -36,4 +36,12 @@ public class ProductService {
     public List<Product> getInStockProducts() {
         return productDao.findInStock();
     }
+
+    public void deleteProduct(Long id) {
+        Product product = productDao.findById(id);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        productDao.delete(product);
+    }
 }
