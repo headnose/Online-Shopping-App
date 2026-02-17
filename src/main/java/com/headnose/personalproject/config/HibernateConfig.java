@@ -1,4 +1,6 @@
 package com.headnose.personalproject.config;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
@@ -10,20 +12,8 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
+@EnableTransactionManagement
 public class HibernateConfig {
-
-    @Bean
-    public DataSource dataSource() {
-        org.springframework.jdbc.datasource.DriverManagerDataSource dataSource =
-                new org.springframework.jdbc.datasource.DriverManagerDataSource();
-
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/shopping_app?useSSL=false&serverTimezone=UTC");
-        dataSource.setUsername("root");
-        dataSource.setPassword("57Headnose@@");
-
-        return dataSource;
-    }
 
 
     @Bean

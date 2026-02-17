@@ -2,24 +2,16 @@ package com.headnose.personalproject.config;
 
 import com.headnose.personalproject.security.JwtFilter;
 import org.springframework.context.annotation.*;
-import org.springframework.security.authentication.
-        AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.
-        configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.
-        HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.
-        EnableWebSecurity;
-import org.springframework.security.config.http.
-        SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.
-        BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.
-        PasswordEncoder;
-import org.springframework.security.web.
-        SecurityFilterChain;
-import org.springframework.security.web.authentication.
-        UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -32,20 +24,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf().disable()
                 .sessionManagement()
-                .sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/user/**").hasRole("USER")
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN") // allow admin too
                 .anyRequest().authenticated();
-
 
         http.addFilterBefore(jwtFilter,
                 UsernamePasswordAuthenticationFilter.class);
@@ -55,8 +44,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config)
-            throws Exception {
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 

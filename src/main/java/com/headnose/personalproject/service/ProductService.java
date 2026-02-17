@@ -17,23 +17,23 @@ public class ProductService {
         this.productDao = productDao;
     }
 
-    public void addProduct(Product product) {
+    public void saveProduct(Product product) {
         productDao.save(product);
+    }
+
+    public void updateProduct(Product product) {
+        productDao.update(product);
+    }
+
+    public Product getProductById(Long id) {
+        return productDao.findById(id);
     }
 
     public List<Product> getAllProducts() {
         return productDao.findAll();
     }
 
-    public List<Product> getAvailableProducts() {
+    public List<Product> getInStockProducts() {
         return productDao.findInStock();
-    }
-
-    public Product getById(Long id) {
-        return productDao.findById(id);
-    }
-
-    public void updateProduct(Product product) {
-        productDao.update(product);
     }
 }

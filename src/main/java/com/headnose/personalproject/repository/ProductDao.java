@@ -49,4 +49,5 @@ public class ProductDao {
     public void update(Product product) {
         sessionFactory.getCurrentSession().merge(product);
     }
+
 }
