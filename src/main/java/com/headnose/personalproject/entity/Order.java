@@ -45,7 +45,6 @@ public class Order {
         item.setOrder(null);
     }
 
-    // ===== Getters & Setters =====
 
     public Long getId() {
         return id;

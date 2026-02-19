@@ -22,7 +22,6 @@ public class HibernateConfig {
         LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
         factory.setDataSource(dataSource);
 
-        // Make sure this matches your entity package exactly
         factory.setPackagesToScan("com.headnose.personalproject.entity");
 
         Properties props = new Properties();

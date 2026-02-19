@@ -16,19 +16,16 @@ public class AdminProductController {
         this.productService = productService;
     }
 
-    // GET all products (including out-of-stock)
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
-    // POST add new product
     @PostMapping
     public void addProduct(@RequestBody Product product) {
         productService.saveProduct(product);
     }
 
-    // PUT update product
     @PutMapping("/{id}")
     public void updateProduct(@PathVariable Long id,
                               @RequestBody Product updatedProduct) {
@@ -43,7 +40,6 @@ public class AdminProductController {
         productService.updateProduct(existing);
     }
 
-    // DELETE product
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
