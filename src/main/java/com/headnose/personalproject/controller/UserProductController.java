@@ -18,7 +18,6 @@ public class UserProductController {
         this.productService = productService;
     }
 
-    // GET all in-stock products
     @GetMapping
     public List<UserProductResponse> getAllInStockProducts() {
 
@@ -34,7 +33,6 @@ public class UserProductController {
     }
 
 
-    // GET product detail
     @GetMapping("/{id}")
     public Product getProductDetail(@PathVariable Long id) {
         return productService.getProductById(id);

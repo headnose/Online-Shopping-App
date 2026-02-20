@@ -32,7 +32,7 @@ public class ProductDao {
                 .getResultList();
     }
 
-    // Criteria example: find in-stock products only
+    // Criteria example:
     public List<Product> findInStock() {
         Session session = sessionFactory.getCurrentSession();
 

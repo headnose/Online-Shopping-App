@@ -11,12 +11,11 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Many items belong to one order
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    // Many items reference one product
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -24,7 +23,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    // Snapshot prices (VERY IMPORTANT REQUIREMENT)
     @Column(nullable = false)
     private BigDecimal purchasedRetailPrice;
 

@@ -13,12 +13,11 @@ public class Watchlist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Many watchlist entries belong to one user
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Many watchlist entries reference one product
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

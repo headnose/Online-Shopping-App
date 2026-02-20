@@ -13,7 +13,6 @@ public class LoggingAspect {
     private static final Logger log =
             LoggerFactory.getLogger(LoggingAspect.class);
 
-    // Log entry into ALL service layer methods
     @Before("execution(* com.headnose.personalproject.service.*.*(..))")
     public void logBeforeService(JoinPoint joinPoint) {
 
@@ -22,7 +21,6 @@ public class LoggingAspect {
                 joinPoint.getArgs());
     }
 
-    // Log successful completion of service methods
     @AfterReturning(
             pointcut = "execution(* com.headnose.personalproject.service.*.*(..))",
             returning = "result")
@@ -32,7 +30,6 @@ public class LoggingAspect {
                 joinPoint.getSignature().toShortString());
     }
 
-    // Log exceptions thrown from service layer
     @AfterThrowing(
             pointcut = "execution(* com.headnose.personalproject.service.*.*(..))",
             throwing = "ex")
