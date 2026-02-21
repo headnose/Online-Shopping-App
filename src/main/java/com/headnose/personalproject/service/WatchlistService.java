@@ -96,6 +96,7 @@ public class WatchlistService {
                     .filter(product -> product.getQuantity() > 0)
                     .map(product -> new WatchlistProductResponse(
                             product.getId(),
+                            product.getName(),
                             product.getDescription(),
                             product.getRetailPrice(),
                             product.getQuantity()

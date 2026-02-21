@@ -38,8 +38,7 @@ public class OrderService {
     }
 
 
-    // PLACE ORDER
-    public void placeOrder(PlaceOrderRequest request) {
+    public OrderResponse placeOrder(PlaceOrderRequest request) {
 
         log.info("Attempting to place order");
 
@@ -89,10 +88,11 @@ public class OrderService {
         orderDao.save(order);
 
         log.info("Order successfully placed for user: {}", username);
+
+        return mapToOrderResponse(order);
     }
 
 
-    // USER CANCEL ORDER
     public void cancelOrderByUser(Long orderId) {
 
         log.info("User attempting to cancel order {}", orderId);
@@ -123,7 +123,6 @@ public class OrderService {
     }
 
 
-    // ADMIN COMPLETE ORDER
     public void completeOrderByAdmin(Long orderId) {
 
         log.info("Admin attempting to complete order {}", orderId);
@@ -146,7 +145,6 @@ public class OrderService {
         log.info("Order {} marked as COMPLETED by admin", orderId);
     }
 
-    // ADMIN CANCEL ORDER
     public void cancelOrderByAdmin(Long orderId) {
 
         log.info("Admin attempting to cancel order {}", orderId);
@@ -177,7 +175,6 @@ public class OrderService {
     }
 
 
-    // USER VIEW ORDERS
     public List<OrderResponse> getOrdersForCurrentUser() {
 
         String username = SecurityContextHolder
@@ -222,7 +219,6 @@ public class OrderService {
         return mapToOrderResponse(order);
     }
 
-    // ADMIN VIEW ALL ORDERS
     public List<AdminOrderResponse> getAllOrdersForAdmin() {
 
         log.info("Admin fetching all orders");
@@ -236,7 +232,6 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // MAPPERS
     private OrderResponse mapToOrderResponse(Order order) {
 
         List<OrderItemResponse> items = order.getOrderItems()

@@ -25,6 +25,7 @@ public class UserProductController {
                 .stream()
                 .map(p -> new UserProductResponse(
                         p.getId(),
+                        p.getName(),
                         p.getDescription(),
                         p.getRetailPrice()
                 ))
@@ -35,6 +36,6 @@ public class UserProductController {
 
     @GetMapping("/{id}")
     public Product getProductDetail(@PathVariable Long id) {
-        return productService.getProductById(id);
+        return productService.getInStockProductById(id);
     }
 }

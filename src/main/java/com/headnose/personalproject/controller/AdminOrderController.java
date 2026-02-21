@@ -1,7 +1,10 @@
 package com.headnose.personalproject.controller;
 
 import com.headnose.personalproject.dto.AdminOrderResponse;
+import com.headnose.personalproject.dto.MessageResponse;
+import com.headnose.personalproject.dto.OrderResponse;
 import com.headnose.personalproject.service.OrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,17 +20,26 @@ public class AdminOrderController {
     }
 
     @PatchMapping("/{id}/complete")
-    public void completeOrder(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> completeOrder(@PathVariable Long id) {
         orderService.completeOrderByAdmin(id);
+        return ResponseEntity.ok(new MessageResponse("Order completed successfully."));
     }
 
     @PatchMapping("/{id}/cancel")
-    public void cancelOrder(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrderByAdmin(id);
+        return ResponseEntity.ok(new MessageResponse("Order canceled successfully."));
     }
 
     @GetMapping
     public List<AdminOrderResponse> getAllOrders() {
         return orderService.getAllOrdersForAdmin();
     }
+
+    @GetMapping("/{id}")
+    public OrderResponse getOrderById(@PathVariable Long id) {
+        return orderService.getOrderByIdForCurrentUser(id);
+    }
 }
+
+

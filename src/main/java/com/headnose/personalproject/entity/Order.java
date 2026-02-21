@@ -25,7 +25,7 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status;
 
-    // One order has many order items
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
@@ -33,7 +33,6 @@ public class Order {
     )
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    // ===== Helper Methods (VERY IMPORTANT) =====
 
     public void addOrderItem(OrderItem item) {
         orderItems.add(item);

@@ -1,5 +1,6 @@
 package com.headnose.personalproject.exception;
 
+import com.headnose.personalproject.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,37 +13,45 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
 
         String errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        return ResponseEntity.badRequest().body(errors);
+        ErrorResponse body = new ErrorResponse(errors, HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<String> handleInvalidCredentials(
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
             InvalidCredentialsException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body("Incorrect credentials, please try again.");
+        ErrorResponse body = new ErrorResponse("Incorrect credentials, please try again.", HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
     @ExceptionHandler(NotEnoughInventoryException.class)
-    public ResponseEntity<String> handleNotEnoughInventory(
+    public ResponseEntity<ErrorResponse> handleNotEnoughInventory(
             NotEnoughInventoryException ex) {
 
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        ErrorResponse body = new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(ProductNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotAvailable(
+            ProductNotAvailableException ex) {
+
+        ErrorResponse body = new ErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(
+    public ResponseEntity<ErrorResponse> handleRuntime(
             RuntimeException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+        ErrorResponse body = new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 }

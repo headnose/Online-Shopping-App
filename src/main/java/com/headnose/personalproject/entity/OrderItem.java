@@ -29,7 +29,6 @@ public class OrderItem {
     @Column(nullable = false)
     private BigDecimal purchasedWholesalePrice;
 
-    // ===== Getters & Setters =====
 
     public Long getId() {
         return id;

@@ -22,7 +22,6 @@ public class Watchlist {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // ===== Getters & Setters =====
 
     public Long getId() {
         return id;

@@ -1,6 +1,7 @@
 package com.headnose.personalproject.service;
 
 import com.headnose.personalproject.entity.Product;
+import com.headnose.personalproject.exception.ProductNotAvailableException;
 import com.headnose.personalproject.repository.ProductDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +22,28 @@ public class ProductService {
         productDao.save(product);
     }
 
-    public void updateProduct(Product product) {
-        productDao.update(product);
+
+    public void updateProduct(Long id, Product updatedProduct) {
+        Product existing = productDao.findById(id);
+        if (existing == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        if (updatedProduct.getName() != null) {
+            existing.setName(updatedProduct.getName());
+        }
+        if (updatedProduct.getDescription() != null) {
+            existing.setDescription(updatedProduct.getDescription());
+        }
+        if (updatedProduct.getWholesalePrice() != null) {
+            existing.setWholesalePrice(updatedProduct.getWholesalePrice());
+        }
+        if (updatedProduct.getRetailPrice() != null) {
+            existing.setRetailPrice(updatedProduct.getRetailPrice());
+        }
+        if (updatedProduct.getQuantity() != null) {
+            existing.setQuantity(updatedProduct.getQuantity());
+        }
+        productDao.update(existing);
     }
 
     public Product getProductById(Long id) {
@@ -35,6 +56,15 @@ public class ProductService {
 
     public List<Product> getInStockProducts() {
         return productDao.findInStock();
+    }
+
+
+    public Product getInStockProductById(Long id) {
+        Product product = productDao.findById(id);
+        if (product == null || product.getQuantity() == null || product.getQuantity() <= 0) {
+            throw new ProductNotAvailableException("Product not available.");
+        }
+        return product;
     }
 
     public void deleteProduct(Long id) {
