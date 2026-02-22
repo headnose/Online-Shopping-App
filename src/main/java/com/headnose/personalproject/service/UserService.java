@@ -1,5 +1,6 @@
 package com.headnose.personalproject.service;
 
+import com.headnose.personalproject.constant.ApiMessages;
 import com.headnose.personalproject.entity.User;
 import com.headnose.personalproject.repository.UserDao;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +22,11 @@ public class UserService {
     public void register(User user) {
 
         if (userDao.findByUsername(user.getUsername()) != null) {
-            throw new RuntimeException("Username already exists");
+            throw new RuntimeException(ApiMessages.USERNAME_ALREADY_EXISTS);
         }
 
         if (userDao.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException(ApiMessages.EMAIL_ALREADY_EXISTS);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

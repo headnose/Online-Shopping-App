@@ -1,5 +1,6 @@
 package com.headnose.personalproject.service;
 
+import com.headnose.personalproject.constant.ApiMessages;
 import com.headnose.personalproject.dto.WatchlistProductResponse;
 import com.headnose.personalproject.entity.*;
 import com.headnose.personalproject.exception.ProductNotAvailableException;
@@ -45,10 +46,10 @@ public class WatchlistService {
         Product product = productDao.findById(productId);
 
         if (product == null) {
-            throw new ProductNotAvailableException("Product not found.");
+            throw new ProductNotAvailableException(ApiMessages.PRODUCT_NOT_FOUND);
         }
         if (product.getQuantity() == null || product.getQuantity() <= 0) {
-            throw new ProductNotAvailableException("Product is out of stock and cannot be added to watchlist.");
+            throw new ProductNotAvailableException(ApiMessages.PRODUCT_OUT_OF_STOCK_WATCHLIST);
         }
 
         Watchlist existing =
@@ -62,7 +63,7 @@ public class WatchlistService {
         // Re-fetch to ensure current quantity before saving
         Product current = productDao.findById(productId);
         if (current == null || current.getQuantity() == null || current.getQuantity() <= 0) {
-            throw new ProductNotAvailableException("Product is out of stock and cannot be added to watchlist.");
+            throw new ProductNotAvailableException(ApiMessages.PRODUCT_OUT_OF_STOCK_WATCHLIST);
         }
 
         Watchlist watchlist = new Watchlist();
@@ -110,9 +111,9 @@ public class WatchlistService {
                     .filter(product -> product.getQuantity() > 0)
                     .map(product -> new WatchlistProductResponse(
                             product.getId(),
+                            product.getName() != null ? product.getName() : product.getDescription(),
                             product.getDescription(),
-                            product.getRetailPrice(),
-                            product.getQuantity()
+                            product.getRetailPrice()
                     ))
                     .collect(Collectors.toList());
         }

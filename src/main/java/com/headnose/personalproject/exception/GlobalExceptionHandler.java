@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponse("Incorrect credentials, please try again."));
+                .body(new MessageResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(NotEnoughInventoryException.class)

@@ -1,7 +1,9 @@
 package com.headnose.personalproject.controller;
 
+import com.headnose.personalproject.dto.RecentPurchaseItemResponse;
 import com.headnose.personalproject.dto.UserProductResponse;
 import com.headnose.personalproject.entity.Product;
+import com.headnose.personalproject.service.OrderService;
 import com.headnose.personalproject.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +15,11 @@ import java.util.stream.Collectors;
 public class UserProductController {
 
     private final ProductService productService;
+    private final OrderService orderService;
 
-    public UserProductController(ProductService productService) {
+    public UserProductController(ProductService productService, OrderService orderService) {
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     @GetMapping
@@ -35,6 +39,11 @@ public class UserProductController {
 
     @GetMapping("/{id}")
     public Product getProductDetail(@PathVariable Long id) {
-        return productService.getProductById(id);
+        return productService.getInStockProductById(id);
+    }
+
+    @GetMapping("/frequent/{limit}")
+    public List<RecentPurchaseItemResponse> getMostFrequentlyPurchased(@PathVariable int limit) {
+        return orderService.getMostFrequentlyPurchasedProducts(limit);
     }
 }

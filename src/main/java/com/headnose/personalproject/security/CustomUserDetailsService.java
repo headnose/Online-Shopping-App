@@ -1,5 +1,6 @@
 package com.headnose.personalproject.security;
 
+import com.headnose.personalproject.constant.ApiMessages;
 import com.headnose.personalproject.entity.User;
 import com.headnose.personalproject.repository.UserDao;
 import org.springframework.security.core.userdetails.*;
@@ -23,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userDao.findByUsername(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException(ApiMessages.USER_NOT_FOUND);
         }
 
         return new CustomUserDetails(user);

@@ -1,8 +1,12 @@
 package com.headnose.personalproject.controller;
 
+import com.headnose.personalproject.constant.ApiMessages;
+import com.headnose.personalproject.dto.MessageResponse;
+import com.headnose.personalproject.dto.RecentPurchaseItemResponse;
 import com.headnose.personalproject.dto.OrderResponse;
 import com.headnose.personalproject.dto.PlaceOrderRequest;
 import com.headnose.personalproject.service.OrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,13 +23,15 @@ public class UserOrderController {
     }
 
     @PostMapping
-    public void placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
+    public ResponseEntity<MessageResponse> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
         orderService.placeOrder(request);
+        return ResponseEntity.ok(new MessageResponse(ApiMessages.ORDER_PLACED));
     }
 
     @PatchMapping("/{id}/cancel")
-    public void cancelOrder(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrderByUser(id);
+        return ResponseEntity.ok(new MessageResponse(ApiMessages.ORDER_CANCELED));
     }
 
     @GetMapping
@@ -36,5 +42,10 @@ public class UserOrderController {
     @GetMapping("/{id}")
     public OrderResponse getOrderById(@PathVariable Long id) {
         return orderService.getOrderByIdForCurrentUser(id);
+    }
+
+    @GetMapping("/recent-items/{limit}")
+    public List<RecentPurchaseItemResponse> getMostRecentlyPurchasedItems(@PathVariable int limit) {
+        return orderService.getMostRecentlyPurchasedItems(limit);
     }
 }

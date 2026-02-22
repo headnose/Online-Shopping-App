@@ -3,6 +3,7 @@ package com.headnose.personalproject.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.headnose.personalproject.constant.ApiMessages;
 import com.headnose.personalproject.dto.*;
 import com.headnose.personalproject.entity.*;
 import com.headnose.personalproject.exception.NotEnoughInventoryException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,8 +70,7 @@ public class OrderService {
                         product.getQuantity());
 
                 throw new NotEnoughInventoryException(
-                        "Not enough inventory for product ID: "
-                                + product.getId());
+                        String.format(ApiMessages.NOT_ENOUGH_INVENTORY_FORMAT, product.getId()));
             }
 
             product.setQuantity(
@@ -95,19 +96,25 @@ public class OrderService {
     // USER CANCEL ORDER
     public void cancelOrderByUser(Long orderId) {
 
-        log.info("User attempting to cancel order {}", orderId);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("User {} attempting to cancel order {}", username, orderId);
 
         Order order = orderDao.findById(orderId);
 
         if (order == null) {
             log.warn("Cancel failed: Order {} not found", orderId);
-            throw new RuntimeException("Order not found");
+            throw new RuntimeException(ApiMessages.ORDER_NOT_FOUND);
+        }
+
+        if (!order.getUser().getUsername().equals(username)) {
+            log.warn("Cancel failed: User {} does not own order {}", username, orderId);
+            throw new RuntimeException(ApiMessages.ORDER_ACCESS_DENIED);
         }
 
         if (order.getStatus() != OrderStatus.PROCESSING) {
             log.warn("Cancel failed: Order {} is not PROCESSING (status: {})",
                     orderId, order.getStatus());
-            throw new RuntimeException("Only PROCESSING orders can be canceled");
+            throw new RuntimeException(ApiMessages.ORDER_ONLY_PROCESSING_CAN_CANCEL);
         }
 
         for (OrderItem item : order.getOrderItems()) {
@@ -132,13 +139,13 @@ public class OrderService {
 
         if (order == null) {
             log.warn("Admin completion failed: Order {} not found", orderId);
-            throw new RuntimeException("Order not found");
+            throw new RuntimeException(ApiMessages.ORDER_NOT_FOUND);
         }
 
         if (order.getStatus() != OrderStatus.PROCESSING) {
             log.warn("Admin completion failed: Order {} not PROCESSING (status: {})",
                     orderId, order.getStatus());
-            throw new RuntimeException("Only PROCESSING orders can be completed");
+            throw new RuntimeException(ApiMessages.ORDER_ONLY_PROCESSING_CAN_COMPLETE);
         }
 
         order.setStatus(OrderStatus.COMPLETED);
@@ -155,13 +162,13 @@ public class OrderService {
 
         if (order == null) {
             log.warn("Admin cancel failed: Order {} not found", orderId);
-            throw new RuntimeException("Order not found");
+            throw new RuntimeException(ApiMessages.ORDER_NOT_FOUND);
         }
 
         if (order.getStatus() != OrderStatus.PROCESSING) {
             log.warn("Admin cancel failed: Order {} not PROCESSING (status: {})",
                     orderId, order.getStatus());
-            throw new RuntimeException("Only PROCESSING orders can be canceled");
+            throw new RuntimeException(ApiMessages.ORDER_ONLY_PROCESSING_CAN_CANCEL);
         }
 
         for (OrderItem item : order.getOrderItems()) {
@@ -211,15 +218,72 @@ public class OrderService {
 
         if (order == null) {
             log.warn("Order {} not found for user {}", orderId, username);
-            throw new RuntimeException("Order not found");
+            throw new RuntimeException(ApiMessages.ORDER_NOT_FOUND);
         }
 
         if (!order.getUser().getUsername().equals(username)) {
             log.warn("Access denied for user {} on order {}", username, orderId);
-            throw new RuntimeException("Access denied: not your order");
+            throw new RuntimeException(ApiMessages.ORDER_ACCESS_DENIED);
         }
 
         return mapToOrderResponse(order);
+    }
+
+    /** Most frequently purchased products for current user (by total quantity), excluding canceled orders. */
+    public List<RecentPurchaseItemResponse> getMostFrequentlyPurchasedProducts(int limit) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userDao.findByUsername(username);
+        List<Order> orders = orderDao.findByUser(user).stream()
+                .filter(o -> o.getStatus() != OrderStatus.CANCELED)
+                .collect(Collectors.toList());
+
+        return orders.stream()
+                .flatMap(o -> o.getOrderItems().stream())
+                .collect(Collectors.groupingBy(
+                        OrderItem::getProduct,
+                        Collectors.summingInt(OrderItem::getQuantity)
+                ))
+                .entrySet().stream()
+                .sorted(Comparator.<java.util.Map.Entry<Product, Integer>>comparingInt(java.util.Map.Entry::getValue).reversed()
+                        .thenComparing(entry -> entry.getKey().getId()))
+                .limit(limit)
+                .map(entry -> {
+                    Product p = entry.getKey();
+                    return new RecentPurchaseItemResponse(
+                            p.getId(),
+                            p.getName() != null ? p.getName() : p.getDescription(),
+                            p.getDescription(),
+                            p.getRetailPrice()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    /** Most recently purchased order items for current user (excluding canceled orders). */
+    public List<RecentPurchaseItemResponse> getMostRecentlyPurchasedItems(int limit) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userDao.findByUsername(username);
+        List<Order> orders = orderDao.findByUser(user).stream()
+                .filter(o -> o.getStatus() != OrderStatus.CANCELED)
+                .sorted(Comparator.comparing(Order::getPlacedTime).reversed())
+                .collect(Collectors.toList());
+
+        return orders.stream()
+                .flatMap(o -> o.getOrderItems().stream()
+                        .map(item -> new java.util.AbstractMap.SimpleEntry<>(item, o.getPlacedTime())))
+                .sorted(Comparator.comparing(java.util.Map.Entry<OrderItem, LocalDateTime>::getValue).reversed())
+                .limit(limit)
+                .map(e -> {
+                    OrderItem item = e.getKey();
+                    Product p = item.getProduct();
+                    return new RecentPurchaseItemResponse(
+                            p.getId(),
+                            p.getName() != null ? p.getName() : p.getDescription(),
+                            p.getDescription(),
+                            item.getPurchasedRetailPrice()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     // ADMIN VIEW ALL ORDERS
@@ -236,6 +300,21 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    // ADMIN GET ORDER BY ID (any order, no user check)
+    public AdminOrderResponse getOrderByIdForAdmin(Long orderId) {
+
+        log.info("Admin fetching order {}", orderId);
+
+        Order order = orderDao.findById(orderId);
+
+        if (order == null) {
+            log.warn("Order {} not found for admin", orderId);
+            throw new RuntimeException(ApiMessages.ORDER_NOT_FOUND);
+        }
+
+        return mapToAdminOrderResponse(order);
+    }
+
     // MAPPERS
     private OrderResponse mapToOrderResponse(Order order) {
 
@@ -243,6 +322,7 @@ public class OrderService {
                 .stream()
                 .map(item -> new OrderItemResponse(
                         item.getProduct().getId(),
+                        item.getProduct().getName() != null ? item.getProduct().getName() : item.getProduct().getDescription(),
                         item.getProduct().getDescription(),
                         item.getQuantity(),
                         item.getPurchasedRetailPrice()
@@ -263,6 +343,7 @@ public class OrderService {
                 .stream()
                 .map(item -> new AdminOrderItemResponse(
                         item.getProduct().getId(),
+                        item.getProduct().getName() != null ? item.getProduct().getName() : item.getProduct().getDescription(),
                         item.getProduct().getDescription(),
                         item.getQuantity(),
                         item.getPurchasedRetailPrice(),

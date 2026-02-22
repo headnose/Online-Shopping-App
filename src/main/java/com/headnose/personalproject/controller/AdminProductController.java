@@ -1,7 +1,10 @@
 package com.headnose.personalproject.controller;
 
+import com.headnose.personalproject.constant.ApiMessages;
+import com.headnose.personalproject.dto.MessageResponse;
 import com.headnose.personalproject.entity.Product;
 import com.headnose.personalproject.service.ProductService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,23 +24,22 @@ public class AdminProductController {
         return productService.getAllProducts();
     }
 
-    @PostMapping
-    public void addProduct(@RequestBody Product product) {
-        productService.saveProduct(product);
+    @GetMapping("/{id}")
+    public Product getProductDetail(@PathVariable Long id) {
+        return productService.getProductByIdOrThrow(id);
     }
 
-    @PutMapping("/{id}")
-    public void updateProduct(@PathVariable Long id,
-                              @RequestBody Product updatedProduct) {
+    @PostMapping
+    public ResponseEntity<MessageResponse> addProduct(@RequestBody Product product) {
+        productService.saveProduct(product);
+        return ResponseEntity.ok(new MessageResponse(ApiMessages.PRODUCT_CREATED));
+    }
 
-        Product existing = productService.getProductById(id);
-
-        existing.setDescription(updatedProduct.getDescription());
-        existing.setWholesalePrice(updatedProduct.getWholesalePrice());
-        existing.setRetailPrice(updatedProduct.getRetailPrice());
-        existing.setQuantity(updatedProduct.getQuantity());
-
-        productService.updateProduct(existing);
+    @PatchMapping("/{id}")
+    public ResponseEntity<MessageResponse> updateProduct(@PathVariable Long id,
+                                                          @RequestBody Product updatedProduct) {
+        productService.updateProductById(id, updatedProduct);
+        return ResponseEntity.ok(new MessageResponse(ApiMessages.PRODUCT_UPDATED));
     }
 
     @DeleteMapping("/{id}")

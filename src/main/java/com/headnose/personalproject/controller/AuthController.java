@@ -1,5 +1,6 @@
 package com.headnose.personalproject.controller;
 
+import com.headnose.personalproject.constant.ApiMessages;
 import com.headnose.personalproject.dto.*;
 import com.headnose.personalproject.entity.User;
 import com.headnose.personalproject.exception.InvalidCredentialsException;
@@ -38,7 +39,7 @@ public class AuthController {
 
         userService.register(user);
 
-        return "User registered successfully";
+        return ApiMessages.USER_REGISTERED;
     }
 
     @PostMapping("/login")
@@ -52,7 +53,7 @@ public class AuthController {
                     )
             );
         } catch (AuthenticationException e) {
-            throw new InvalidCredentialsException("Invalid login");
+            throw new InvalidCredentialsException(ApiMessages.INVALID_CREDENTIALS);
         }
 
         User user = userService.findByUsername(request.getUsername());
