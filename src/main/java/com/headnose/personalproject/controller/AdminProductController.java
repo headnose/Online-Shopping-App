@@ -1,8 +1,11 @@
 package com.headnose.personalproject.controller;
 
 import com.headnose.personalproject.constant.ApiMessages;
+import com.headnose.personalproject.dto.AdminMostPopularProductResponse;
+import com.headnose.personalproject.dto.AdminMostProfitableProductResponse;
 import com.headnose.personalproject.dto.MessageResponse;
 import com.headnose.personalproject.entity.Product;
+import com.headnose.personalproject.service.OrderService;
 import com.headnose.personalproject.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +17,26 @@ import java.util.List;
 public class AdminProductController {
 
     private final ProductService productService;
+    private final OrderService orderService;
 
-    public AdminProductController(ProductService productService) {
+    public AdminProductController(ProductService productService, OrderService orderService) {
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    @GetMapping("/popular/{limit}")
+    public List<AdminMostPopularProductResponse> getMostPopularProducts(@PathVariable int limit) {
+        return orderService.getAdminMostPopularProducts(limit);
+    }
+
+    @GetMapping("/profit/{limit}")
+    public List<AdminMostProfitableProductResponse> getMostProfitableProducts(@PathVariable int limit) {
+        return orderService.getAdminMostProfitableProducts(limit);
     }
 
     @GetMapping("/{id}")

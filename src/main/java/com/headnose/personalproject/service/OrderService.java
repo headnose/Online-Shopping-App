@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -313,6 +314,61 @@ public class OrderService {
         }
 
         return mapToAdminOrderResponse(order);
+    }
+
+    /** Top 3 most popular/sold products from completed orders only (excludes Processing and Canceled). */
+    public List<AdminMostPopularProductResponse> getAdminMostPopularProducts(int limit) {
+        List<Order> completedOrders = orderDao.findByStatus(OrderStatus.COMPLETED);
+        return completedOrders.stream()
+                .flatMap(o -> o.getOrderItems().stream())
+                .collect(Collectors.groupingBy(
+                        OrderItem::getProduct,
+                        Collectors.summingInt(OrderItem::getQuantity)
+                ))
+                .entrySet().stream()
+                .sorted(Comparator.<java.util.Map.Entry<Product, Integer>>comparingInt(java.util.Map.Entry::getValue).reversed()
+                        .thenComparing(entry -> entry.getKey().getId()))
+                .limit(limit)
+                .map(entry -> {
+                    Product p = entry.getKey();
+                    return new AdminMostPopularProductResponse(
+                            p.getId(),
+                            p.getName() != null ? p.getName() : p.getDescription(),
+                            p.getDescription(),
+                            entry.getValue()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    /** Top N most profitable products from completed orders. Profit uses order-item purchased prices (retail - wholesale). */
+    public List<AdminMostProfitableProductResponse> getAdminMostProfitableProducts(int limit) {
+        List<Order> completedOrders = orderDao.findByStatus(OrderStatus.COMPLETED);
+        return completedOrders.stream()
+                .flatMap(o -> o.getOrderItems().stream())
+                .collect(Collectors.groupingBy(
+                        OrderItem::getProduct,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                item -> BigDecimal.valueOf(item.getQuantity())
+                                        .multiply(item.getPurchasedRetailPrice().subtract(item.getPurchasedWholesalePrice())),
+                                BigDecimal::add
+                        )
+                ))
+                .entrySet().stream()
+                .sorted(Comparator.comparing((java.util.Map.Entry<Product, BigDecimal> e) -> e.getValue()).reversed()
+                        .thenComparing(e -> e.getKey().getId()))
+                .limit(limit)
+                .map(entry -> {
+                    Product p = entry.getKey();
+                    return new AdminMostProfitableProductResponse(
+                            p.getId(),
+                            p.getName() != null ? p.getName() : p.getDescription(),
+                            p.getDescription(),
+                            entry.getValue()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     // MAPPERS
