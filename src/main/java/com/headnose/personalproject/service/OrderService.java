@@ -95,13 +95,23 @@ public class OrderService {
 
     public void cancelOrderByUser(Long orderId) {
 
-        log.info("User attempting to cancel order {}", orderId);
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        log.info("User {} attempting to cancel order {}", username, orderId);
 
         Order order = orderDao.findById(orderId);
 
         if (order == null) {
             log.warn("Cancel failed: Order {} not found", orderId);
             throw new RuntimeException("Order not found");
+        }
+
+        if (!order.getUser().getUsername().equals(username)) {
+            log.warn("Cancel failed: User {} does not own order {}", username, orderId);
+            throw new RuntimeException("Access denied: not your order");
         }
 
         if (order.getStatus() != OrderStatus.PROCESSING) {
