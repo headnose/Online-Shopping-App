@@ -1,5 +1,6 @@
 package com.headnose.personalproject.exception;
 
+import com.headnose.personalproject.dto.MessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,37 +13,44 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<MessageResponse> handleValidation(MethodArgumentNotValidException ex) {
 
         String errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity.badRequest().body(new MessageResponse(errors));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<String> handleInvalidCredentials(
+    public ResponseEntity<MessageResponse> handleInvalidCredentials(
             InvalidCredentialsException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body("Incorrect credentials, please try again.");
+                .body(new MessageResponse("Incorrect credentials, please try again."));
     }
 
     @ExceptionHandler(NotEnoughInventoryException.class)
-    public ResponseEntity<String> handleNotEnoughInventory(
+    public ResponseEntity<MessageResponse> handleNotEnoughInventory(
             NotEnoughInventoryException ex) {
 
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.badRequest().body(new MessageResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProductNotAvailableException.class)
+    public ResponseEntity<MessageResponse> handleProductNotAvailable(
+            ProductNotAvailableException ex) {
+
+        return ResponseEntity.badRequest().body(new MessageResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(
+    public ResponseEntity<MessageResponse> handleRuntime(
             RuntimeException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+                .body(new MessageResponse(ex.getMessage()));
     }
 }
