@@ -2,6 +2,7 @@ package com.headnose.personalproject.service;
 
 import com.headnose.personalproject.dto.WatchlistProductResponse;
 import com.headnose.personalproject.entity.*;
+import com.headnose.personalproject.exception.ProductNotAvailableException;
 import com.headnose.personalproject.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +44,25 @@ public class WatchlistService {
         User user = userDao.findByUsername(username);
         Product product = productDao.findById(productId);
 
+        if (product == null) {
+            throw new ProductNotAvailableException("Product not found.");
+        }
+        if (product.getQuantity() == null || product.getQuantity() <= 0) {
+            throw new ProductNotAvailableException("Product is out of stock and cannot be added to watchlist.");
+        }
+
         Watchlist existing =
                 watchlistDao.findByUserAndProduct(user, product);
 
         if (existing != null) {
             log.warn("Product {} already in watchlist for user {}", productId, username);
             return;
+        }
+
+        // Re-fetch product to ensure we have current quantity before saving (avoids stale/cached value)
+        Product current = productDao.findById(productId);
+        if (current == null || current.getQuantity() == null || current.getQuantity() <= 0) {
+            throw new ProductNotAvailableException("Product is out of stock and cannot be added to watchlist.");
         }
 
         Watchlist watchlist = new Watchlist();
