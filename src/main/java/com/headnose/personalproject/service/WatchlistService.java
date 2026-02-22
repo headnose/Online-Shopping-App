@@ -59,7 +59,6 @@ public class WatchlistService {
             return;
         }
 
-        // Re-fetch product to ensure we have current quantity before saving (avoids stale/cached value)
         Product current = productDao.findById(productId);
         if (current == null || current.getQuantity() == null || current.getQuantity() <= 0) {
             throw new ProductNotAvailableException("Product is out of stock and cannot be added to watchlist.");
