@@ -29,6 +29,7 @@ public class UserProductController {
                 .stream()
                 .map(p -> new UserProductResponse(
                         p.getId(),
+                        p.getName(),
                         p.getDescription(),
                         p.getRetailPrice()
                 ))
@@ -38,8 +39,16 @@ public class UserProductController {
 
 
     @GetMapping("/{id}")
-    public Product getProductDetail(@PathVariable Long id) {
-        return productService.getInStockProductById(id);
+    public UserProductResponse getProductDetail(@PathVariable Long id) {
+
+        Product p = productService.getInStockProductById(id);
+
+        return new UserProductResponse(
+                p.getId(),
+                p.getName(),
+                p.getDescription(),
+                p.getRetailPrice()
+        );
     }
 
     @GetMapping("/frequent/{limit}")

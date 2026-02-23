@@ -7,6 +7,8 @@ import com.headnose.personalproject.exception.InvalidCredentialsException;
 import com.headnose.personalproject.security.JwtUtil;
 import com.headnose.personalproject.service.UserService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -39,7 +41,8 @@ public class AuthController {
 
         userService.register(user);
 
-        return ApiMessages.USER_REGISTERED;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new MessageResponse(ApiMessages.USER_REGISTERED));
     }
 
     @PostMapping("/login")
