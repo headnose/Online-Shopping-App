@@ -47,12 +47,24 @@ public class OrderService {
 
             Product product = productDao.findById(itemRequest.getProductId());
 
-            if (product.getQuantity() < itemRequest.getQuantity()) {
-                throw new NotEnoughInventoryException(
-                        String.format(ApiMessages.NOT_ENOUGH_INVENTORY_FORMAT, product.getId()));
+            if (product == null) {
+                throw new RuntimeException(
+                        "Product with id " + itemRequest.getProductId() + " not found"
+                );
             }
 
-            product.setQuantity(product.getQuantity() - itemRequest.getQuantity());
+            if (product.getQuantity() < itemRequest.getQuantity()) {
+                throw new NotEnoughInventoryException(
+                        String.format(
+                                ApiMessages.NOT_ENOUGH_INVENTORY_FORMAT,
+                                product.getId()
+                        )
+                );
+            }
+
+            product.setQuantity(
+                    product.getQuantity() - itemRequest.getQuantity()
+            );
 
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
@@ -65,8 +77,6 @@ public class OrderService {
 
         orderDao.save(order);
     }
-
-
     // USER CANCEL ORDER
 
     public void cancelOrderByUser(Long orderId) {

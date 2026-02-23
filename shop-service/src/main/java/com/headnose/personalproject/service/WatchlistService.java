@@ -7,6 +7,7 @@ import com.headnose.personalproject.entity.Watchlist;
 import com.headnose.personalproject.exception.ProductNotAvailableException;
 import com.headnose.personalproject.repository.ProductDao;
 import com.headnose.personalproject.repository.WatchlistDao;
+import com.headnose.personalproject.security.CustomUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,12 +34,17 @@ public class WatchlistService {
     }
 
     private Long extractUserId() {
-        String subject = SecurityContextHolder
+
+        Object principal = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getName();
+                .getPrincipal();
 
-        return Long.parseLong(subject);
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getId();
+        }
+
+        throw new RuntimeException("Invalid authentication principal");
     }
 
     public void addToWatchlist(Long productId) {
@@ -96,7 +102,7 @@ public class WatchlistService {
                 .filter(product -> product.getQuantity() > 0)
                 .map(product -> new WatchlistProductResponse(
                         product.getId(),
-                        product.getName() != null ? product.getName() : product.getDescription(),
+                        product.getName(),
                         product.getDescription(),
                         product.getRetailPrice()
                 ))
