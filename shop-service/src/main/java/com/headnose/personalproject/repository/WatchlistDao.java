@@ -1,6 +1,6 @@
 package com.headnose.personalproject.repository;
 
-import com.headnose.personalproject.entity.*;
+import com.headnose.personalproject.entity.Watchlist;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
@@ -23,18 +23,18 @@ public class WatchlistDao {
         sessionFactory.getCurrentSession().remove(watchlist);
     }
 
-    public Watchlist findByUserAndProduct(User user, Product product) {
+    public Watchlist findByUserIdAndProductId(Long userId, Long productId) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from Watchlist w where w.user = :user and w.product = :product", Watchlist.class)
-                .setParameter("user", user)
-                .setParameter("product", product)
+                .createQuery("from Watchlist w where w.userId = :userId and w.product.id = :productId", Watchlist.class)
+                .setParameter("userId", userId)
+                .setParameter("productId", productId)
                 .uniqueResult();
     }
 
-    public List<Watchlist> findByUser(User user) {
+    public List<Watchlist> findByUserId(Long userId) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from Watchlist w where w.user = :user", Watchlist.class)
-                .setParameter("user", user)
+                .createQuery("from Watchlist w where w.userId = :userId", Watchlist.class)
+                .setParameter("userId", userId)
                 .getResultList();
     }
 }

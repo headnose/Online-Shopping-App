@@ -31,9 +31,9 @@ public class OrderService {
         this.productDao = productDao;
     }
 
-    // =========================================
+
     // PLACE ORDER
-    // =========================================
+
     public void placeOrder(PlaceOrderRequest request) {
 
         Long userId = extractUserIdFromSecurityContext();
@@ -66,9 +66,9 @@ public class OrderService {
         orderDao.save(order);
     }
 
-    // =========================================
+
     // USER CANCEL ORDER
-    // =========================================
+
     public void cancelOrderByUser(Long orderId) {
 
         Long userId = extractUserIdFromSecurityContext();
@@ -94,9 +94,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELED);
     }
 
-    // =========================================
     // ADMIN COMPLETE ORDER
-    // =========================================
     public void completeOrderByAdmin(Long orderId) {
 
         Order order = orderDao.findById(orderId);
@@ -112,9 +110,7 @@ public class OrderService {
         order.setStatus(OrderStatus.COMPLETED);
     }
 
-    // =========================================
     // ADMIN CANCEL ORDER
-    // =========================================
     public void cancelOrderByAdmin(Long orderId) {
 
         Order order = orderDao.findById(orderId);
@@ -135,9 +131,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELED);
     }
 
-    // =========================================
     // USER VIEW ORDERS
-    // =========================================
     public List<OrderResponse> getOrdersForCurrentUser() {
 
         Long userId = extractUserIdFromSecurityContext();
@@ -221,9 +215,9 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // =========================================
+
     // ADMIN VIEW
-    // =========================================
+
     public List<AdminOrderResponse> getAllOrdersForAdmin() {
         return orderDao.findAll()
                 .stream()
@@ -242,9 +236,7 @@ public class OrderService {
         return mapToAdminOrderResponse(order);
     }
 
-    // =========================================
-    // ADMIN STATS (REQUIRED)
-    // =========================================
+    // ADMIN STATS
     public List<AdminMostPopularProductResponse> getAdminMostPopularProducts(int limit) {
 
         List<Order> completedOrders = orderDao.findByStatus(OrderStatus.COMPLETED);
@@ -304,9 +296,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // =========================================
-    // HELPERS
-    // =========================================
+
     private Long extractUserIdFromSecurityContext() {
 
         Object principal = SecurityContextHolder.getContext()
@@ -320,9 +310,6 @@ public class OrderService {
         throw new RuntimeException("Invalid authentication principal");
     }
 
-    // =========================================
-    // MAPPERS
-    // =========================================
     private OrderResponse mapToOrderResponse(Order order) {
 
         List<OrderItemResponse> items = order.getOrderItems()

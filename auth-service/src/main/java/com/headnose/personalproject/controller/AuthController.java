@@ -61,6 +61,7 @@ public class AuthController {
         String role = user.getRole();
 
         String token = jwtUtil.generateToken(
+                user.getId(),
                 user.getUsername(),
                 role
         );

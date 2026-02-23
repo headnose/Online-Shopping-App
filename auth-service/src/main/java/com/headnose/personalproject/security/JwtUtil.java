@@ -11,10 +11,11 @@ public class JwtUtil {
     private final String SECRET_KEY = "mySecretKeyForJwtGeneration";
     private final long EXPIRATION_TIME = 86400000; // 1 day
 
-    public String generateToken(String username, String role) {
+    public String generateToken(Long userId, String username, String role) {
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("userId", userId)
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))

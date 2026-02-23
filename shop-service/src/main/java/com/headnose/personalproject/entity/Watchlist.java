@@ -3,36 +3,35 @@ package com.headnose.personalproject.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "watchlist",
+@Table(
+        name = "watchlist",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"user_id", "product_id"})
-        })
+        }
+)
 public class Watchlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-
     public Long getId() {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Product getProduct() {
