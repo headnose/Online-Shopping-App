@@ -5,7 +5,6 @@ public final class ApiMessages {
     private ApiMessages() {
     }
 
-    // --- Success (controllers) ---
     public static final String PRODUCT_CREATED = "Product created successfully.";
     public static final String PRODUCT_UPDATED = "Product updated successfully.";
     public static final String ORDER_PLACED = "Order placed successfully.";
@@ -15,11 +14,9 @@ public final class ApiMessages {
     public static final String PRODUCT_REMOVED_FROM_WATCHLIST = "Product removed from watchlist.";
     public static final String USER_REGISTERED = "User registered successfully.";
 
-    // Watchlist view
     public static final String WATCHLIST_EMPTY = "Your watchlist is empty.";
     public static final String WATCHLIST_ITEMS_COUNT = "Watchlist has %d item(s).";
 
-    // Errors (exceptions
     public static final String INVALID_CREDENTIALS = "Incorrect credentials, please try again.";
     public static final String PRODUCT_NOT_FOUND = "Product not found.";
     public static final String PRODUCT_NOT_AVAILABLE = "Product not available.";
