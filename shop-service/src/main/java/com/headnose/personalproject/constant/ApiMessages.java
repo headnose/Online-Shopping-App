@@ -1,10 +1,5 @@
 package com.headnose.personalproject.constant;
 
-/**
- * Centralized API response and exception messages.
- * Use these constants in controllers and when throwing exceptions so the
- * same message is returned to the client and handled consistently.
- */
 public final class ApiMessages {
 
     private ApiMessages() {
