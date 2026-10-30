@@ -1,6 +1,7 @@
 package com.headnose.personalproject.security;
 
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -8,7 +9,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "mySecretKeyForJwtGeneration";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
     private final long EXPIRATION_TIME = 86400000; // 1 day
 
     public String generateToken(String username, String role) {
